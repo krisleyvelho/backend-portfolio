@@ -4,6 +4,7 @@ import * as bcrypt from 'bcrypt';
 import { AuthService } from "./auth.service";
 import { LoginUserDto } from "./dto/login-user.dto";
 import { RegisterUserDto } from "./dto/register-user.dto";
+import { Public } from "./decorators/public-decorator";
 
 @Controller('auth')
 @ApiTags('auth')
@@ -12,6 +13,7 @@ export class AuthController {
     private readonly authService: AuthService,
   ) {}
 
+  @Public()
   @ApiOperation({ summary: 'Make a login request' })
   @Post('login')
   login(@Body() loginDto: LoginUserDto) { 

@@ -3,6 +3,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { User } from './entities/user.entity';
+import { instanceToInstance } from 'class-transformer';
 
 @Injectable()
 export class UsersService {
@@ -10,15 +11,15 @@ export class UsersService {
 
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
+  ) { }
 
   async findAll() {
-    const allUSers = await this.userRepository.find()
-    return allUSers;
+    const allUSers = await this.userRepository.find();
+    return instanceToInstance(allUSers);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(id: User['id']) {
+    return await this.userRepository.findOneBy({ id })?.then((user) => instanceToInstance(user));
   }
 
   update(id: number, updateUserDto: UpdateUserDto) {

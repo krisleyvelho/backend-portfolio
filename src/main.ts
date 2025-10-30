@@ -1,7 +1,8 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import { JwtAuthGuard } from './auth/guards/jwt-auth.guard';
 
 
 async function bootstrap() {
@@ -28,6 +29,10 @@ async function bootstrap() {
       transform: true, // Transforma os payloads em instâncias do DTO
     }),
   );
+
+  // Guard para tratar requisições com/sem JWT
+  const reflector = app.get(Reflector);
+  app.useGlobalGuards(new JwtAuthGuard(reflector));
 
   await app.listen(SERVERPORT);
 }
