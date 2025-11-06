@@ -3,6 +3,7 @@ import { Injectable, ExecutionContext, UnauthorizedException } from '@nestjs/com
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
 import { IS_PUBLIC_KEY } from '../decorators/public-decorator';
+import { TokenExpiredError } from '@nestjs/jwt';
 
 @Injectable()
 export class JwtAuthGuard extends AuthGuard('jwt') {
@@ -12,14 +13,11 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
 
   canActivate(context: ExecutionContext) {
     const requestHeaders = context.switchToHttp().getRequest()?.headers;
-    // console.log('headers', headers);
 
     if(!requestHeaders?.authorization) {
       throw new UnauthorizedException('No token provided');
     }
 
-
-    // console.log('context', context);
     const isPublic = this.reflector.getAllAndOverride<boolean>(IS_PUBLIC_KEY, [
       context.getHandler(),
       context.getClass(),
@@ -34,6 +32,9 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
   }
 
   handleRequest(err, user, info) {
+    if(info instanceof TokenExpiredError) {
+      throw new UnauthorizedException('Expired token. Try to login again');
+    }
     if (err || !user) {
       throw err || new UnauthorizedException('Invalid token');
     }

@@ -14,6 +14,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(payload: any) {
+    console.log('payload', payload);
     // Aqui você pode adicionar validações extras, como verificar se o usuário ainda existe
     return { userId: payload.sub, email: payload.email };
   }
